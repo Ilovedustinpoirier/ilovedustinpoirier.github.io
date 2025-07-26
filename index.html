@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Квест Настроения Лизы — Расширенная Версия</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Comfortaa&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Comfortaa', cursive;
+      background: linear-gradient(to bottom, #fceefc, #ffe6f0);
+      color: #333;
+      padding: 20px;
+      max-width: 700px;
+      margin: auto;
+    }
+    .card {
+      background: white;
+      border-radius: 25px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      padding: 25px;
+      margin-bottom: 30px;
+      animation: fadeIn 0.8s ease;
+    }
+    .choices button {
+      display: block;
+      width: 100%;
+      margin-top: 12px;
+      padding: 12px;
+      background-color: #ffb3d9;
+      border: none;
+      border-radius: 15px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 1rem;
+      transition: background-color 0.3s ease;
+    }
+    .choices button:hover {
+      background-color: #ff99cc;
+    }
+    h2 {
+      text-align: center;
+      color: #ff66b2;
+    }
+    @keyframes fadeIn {
+      from {opacity: 0; transform: translateY(20px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+    .emoji {
+      font-size: 2rem;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    .final-message {
+      text-align: center;
+      font-size: 1.4rem;
+      color: #e60073;
+      font-weight: bold;
+      margin-top: 20px;
+      animation: fadeInHeart 2s ease-in-out infinite;
+    }
+    .final-photo, .meme-photo {
+      display: block;
+      margin: 15px auto;
+      max-width: 100%;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    @keyframes floatHearts {
+      0% {transform: translateY(0); opacity: 1;}
+      100% {transform: translateY(-100px); opacity: 0;}
+    }
+    .heart {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background-color: pink;
+      transform: rotate(45deg);
+      animation: floatHearts 3s ease-in-out infinite;
+    }
+    .heart::before,
+    .heart::after {
+      content: "";
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background-color: pink;
+      border-radius: 50%;
+    }
+    .heart::before {
+      top: -10px;
+      left: 0;
+    }
+    .heart::after {
+      left: -10px;
+      top: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="card" id="game">
+    <div class="emoji">💖</div>
+    <h2>Квест Настроения Лизы</h2>
+    <div id="text"></div>
+    <div class="choices"></div>
+  </div>
+
+  <audio id="bgMusic" loop autoplay muted>
+    <source src="https://cdn.pixabay.com/download/audio/2023/03/28/audio_631f902d92.mp3?filename=romantic-piano-145239.mp3" type="audio/mpeg">
+  </audio>
+
+  <script>
+    const text = document.getElementById("text");
+    const choicesContainer = document.querySelector(".choices");
+
+    const scenes = {
+      start: {
+        text: "Ты просыпаешься и сначала хочешь просто остаться под одеялом. Но вдруг вспоминаешь — этот день может стать особенным. Что ты делаешь первым делом?",
+        image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSW5DNk40KWZ4rZjj1jzhOsuVEg1iWAC5e_Qg&s",
+        choices: { A: "phone", B: "blanket", C: "window" },
+        buttons: [
+          "A. Тянусь за телефоном и открываю мессенджеры 📱",
+          "B. Заворачиваюсь в плед как буррито и лежу драматично 😴",
+          "C. Сажусь у окна, включаю музыку и просто дышу 🌧️"
+        ]
+      },
+      phone: {
+        text: "Экран мерцает. Первое сообщение — от меня: \"Привет, Лиза. Если ты читаешь это, значит ты в начале чего-то милого.\" Что ты чувствуешь?",
+        image: "https://media.tenor.com/kEjTMxgbFZYAAAAe/smirk-cat.png",
+        choices: { A: "scroll_memes", B: "message_me" },
+        buttons: [
+          "A. Улыбаюсь и начинаю листать мемы 🐸",
+          "B. Думаю: \"Он знает, когда я грущу...\" и отвечаю 💌"
+        ]
+      },
+      scroll_memes: {
+        text: "Мемы — твоё безопасное место. Жираф в свитере, кот в ванне, грустный лягушонок. Они будто отражают тебя. Один особенно смешной — что ты делаешь?",
+        image: "https://media.tenor.com/QpEmM_tD8Y8AAAAM/thoughts.gif",
+        choices: { A: "send_meme", B: "save_meme" },
+        buttons: [
+          "A. Отправляю его мне с комментом: 'Ты это ты' 😂",
+          "B. Сохраняю в любимые как талисман на день ✨"
+        ]
+      },
+      message_me: {
+        text: "Ты пишешь: \"А я как раз думаю о тебе.\" Ответ приходит почти сразу. Это как глоток воздуха. Что дальше?",
+        image: "https://i.imgflip.com/6xlbkw.jpg?a486984",
+        choices: { A: "scene_end", B: "window" },
+        buttons: [
+          "A. Переписка затягивает, настроение поднимается 💬",
+          "B. Решаю встать и вдохновиться утром 🌅"
+        ]
+      },
+      send_meme: {
+        text: "Ты знаешь, что я оценю. И ты права. Мем поднимает мне настроение, и я отвечаю: \"Ты лучшая находка интернета сегодня.\"",
+        image: "https://media.tenor.com/HSxxt1scQXYAAAAM/cat-hugs.gif",
+        choices: { A: "scene_end" },
+        buttons: [ "A. Улыбнуться и перейти к делу дня ☀️" ]
+      },
+      save_meme: {
+        text: "Папка с мемами — твой амулет. Один день — один мем. Сегодня этот станет якорем. Может, он спасёт настроение кому-то ещё?",
+        image: "https://i.imgflip.com/7zc9s6.jpg",
+        choices: { A: "scene_end" },
+        buttons: [ "A. Делюсь мемом в сторис с подписью: 'Живём' 💫" ]
+      },
+      blanket: {
+        text: "Ты заворачиваешься плотнее. В голове играет саундтрек из скандинавской драмы. И вдруг мысль: а если весь день провести в этом коконе?",
+        image: "https://i.imgflip.com/44h38a.jpg",
+        choices: { A: "open_tiktok", B: "wiggle_toe" },
+        buttons: [
+          "A. Потянусь за телефоном и нырну в TikTok 🌀",
+          "B. Шевельну пальцем. Маленькое \"да\" новому дню ☝️"
+        ]
+      },
+      open_tiktok: {
+        text: "Ленты бесконечны. Но вдруг ролик — где девушка говорит: \"Ты заслуживаешь любви. Да, ты.\" Это ударяет в сердце. Что ты чувствуешь?",
+        image: "https://iq.wiki/cdn-cgi/image/width=1920,quality=70/https://ipfs.everipedia.org/ipfs/QmfHhmi69k6nas2DveECihxrQisdH9Xp6SQvZS9Cz9QqGp",
+        choices: { A: "scene_end" },
+        buttons: [ "A. Вспоминаю что у меня есть синтапишни Ибрагим. Закрываю TikTok. Время — быть собой 💗" ]
+      },
+      wiggle_toe: {
+        text: "Ты двигаешь пальцем. Кажется глупо, но в этом жесте — начало. Как будто жизнь сказала: 'Я здесь'. Что дальше?",
+        image: "https://lh3.googleusercontent.com/proxy/boNv_PXTfmVKc9FM_0ZiAX8rdNkrH3f2AgUc7lhkaOTRd_lalgxpEvzLUzFCdypk5_pcmPgExrXmvrp3FE0eIxO_xd5_hrJe-csyrT0xDhBJWFEEGIeDlhPTuikFGKWN41T8lMTbTOFXV-rkX1Ew7z_1CWYwF7UREP5JJo4C",
+        choices: { A: "window", B: "message_me" },
+        buttons: [
+          "A. Идти к окну и смотреть, как дышит утро 🌤️",
+          "B. Написать мне — потому что я всегда откликнусь ✉️"
+        ]
+      },
+      window: {
+        text: "За окном дождь. Кажется, он знает, что ты чувствуешь. Музыка играет, и ты ощущаешь себя героиней фильма. Что сделать прямо сейчас?",
+        image: "https://www.tcpalm.com/gcdn/-mm-/7411d2267ce401bceb979fa91ee95533bd66d525/c=65-0-561-373/local/-/media/2018/05/22/TreasureCoast/TreasureCoast/636625877055231207-shamu.JPG",
+        choices: { A: "dance", B: "lapland" },
+        buttons: [
+          "A. Танцевать под музыку, всё ещё в пижаме 🩰",
+          "B. Написать мне: 'Собирай чемодан. Улетаем в Австралию!' ✈️"
+        ]
+      },
+      dance: {
+        text: "Ты кружишься, как будто весь мир исчез. Есть только ты, музыка и пижама. Всё не так плохо, правда?",
+        image: "https://i.pinimg.com/736x/73/62/50/7362503e0ea8b3b5246e1463c7105a5f.jpg",
+        choices: { A: "scene_end" },
+        buttons: [ "A. Смеюсь сама с себя и ставлю чай ☕" ]
+      },
+      lapland: {
+        text: "Я отвечаю: \"Где мой чемодан?!\". Мы не улетаем — пока. Но идея прекрасна.",
+        image: "https://i.chzbgr.com/full/9077036032/h83807761/ironic-meme-with-impact-font-saying-that-behind-every-successful-unicorn-there-is-a-pack-of-haters",
+        choices: { A: "scene_end" },
+        buttons: [ "A. Открываю Pinterest и ищу есть ли в Австралии Уникорн ✨" ]
+      },
+      scene_end: {
+        text: "Лиза, я рад, что ты прошла этот квест. Надеюсь у тебя щас улыбка на лице когда это читаешь. Я рядом. Всегда. Люблю. <3",
+        image: "https://i.imgur.com/THJ5Idf.jpeg"
+      }
+    };
+
+    function renderScene(key) {
+      const scene = scenes[key];
+      let html = `<p>${scene.text}</p>`;
+      if (scene.image) {
+        const className = key === 'scene_end' ? 'final-photo' : 'meme-photo';
+        html += `<img src="${scene.image}" alt="scene" class="${className}">`;
+      }
+      text.innerHTML = html;
+      choicesContainer.innerHTML = "";
+
+      if (!scene.choices) {
+        choicesContainer.innerHTML = `<p class="final-message">Ты получила невидимую корону 👑 и +1 к настроению. Ты молодец.</p>`;
+
+        const audio = document.getElementById('bgMusic');
+        audio.muted = false;
+        audio.play();
+
+        for (let i = 0; i < 10; i++) {
+          const heart = document.createElement('div');
+          heart.className = 'heart';
+          heart.style.left = Math.random() * 100 + '%';
+          heart.style.top = Math.random() * 20 + 80 + '%';
+          heart.style.animationDelay = `${Math.random() * 3}s`;
+          document.body.appendChild(heart);
+        }
+        return;
+      }
+
+      const labels = Object.keys(scene.choices);
+      for (let i = 0; i < labels.length; i++) {
+        const label = labels[i];
+        const button = document.createElement("button");
+        button.innerText = scene.buttons[i];
+        button.onclick = () => renderScene(scene.choices[label]);
+        choicesContainer.appendChild(button);
+      }
+    }
+
+    renderScene("start");
+  </script>
+</body>
+</html>
